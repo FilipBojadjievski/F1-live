@@ -1,0 +1,44 @@
+/* Design tokens — Design.md §7 */
+:root {
+  --bg: #0a0a0f;
+  --panel: #15151e;
+  --text: #f0f0f5;
+  --muted: #8a8a99;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: var(--text);
+}
+
+.top-nav {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+}
+
+.top-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.top-nav a.active {
+  color: var(--text);
+}
+
+main {
+  padding: 1.25rem;
+}
