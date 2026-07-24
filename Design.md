@@ -92,7 +92,11 @@ src/
   components/Transport.tsx    // play/pause, speed, seek bar with lap markers
   theme.css               // design tokens
 scripts/
-  ingest.ts               // Node script: fetch OpenF1 → bake replay JSON
+  ingest.ts               // Node/tsx entry: orchestration (fetch → bake → validate → write)
+  openf1.ts               // OpenF1 raw types + rate-limited/retrying client (RateLimiter, withRetry)
+  bake.ts                 // pure transforms: raw records → replay streams (unit-tested)
+  validate.ts             // pure hard-fail gate: order/size/driver checks (unit-tested)
+  rounds.ts               // pure round selection: session-key match + no-arg diff (unit-tested)
 .github/workflows/
   ingest.yml              // cron + workflow_dispatch(round)
   deploy.yml              // build → GitHub Pages
@@ -104,9 +108,11 @@ Routing: `react-router` — `/` (standings), `/races`, `/replay/:round`.
 
 1. Read `replays/index.json`; ask jolpica which 2026 rounds are completed; diff → rounds to bake (or take an explicit `--round n`).
 2. For each round, resolve the OpenF1 `session_key` for the race, then fetch `drivers`, `position`, `intervals`, `laps`, `location` (location chunked by time window to respect response-size limits), `session_result`.
-3. Throttle: global limiter well under 30 req/min; retry with backoff on 429/5xx.
-4. Bake: downsample, sort, normalize → replay JSON. Derive `track.outline` from the leader's fastest clean lap.
-5. **Validate:** final `positions` order must equal `session_result` order; file must be under the size cap. Any failure → non-zero exit, no commit.
+   - **Round → session:** OpenF1 exposes the *full* 24-race schedule (incl. rounds jolpica hasn't marked complete), and its chronological order does **not** index-align with jolpica's round numbers. So the round is resolved by **matching the OpenF1 Race session whose start is nearest jolpica's race time** (within a day), not by position.
+   - **Empty location windows:** a session's `date_end` runs past the last real sample, so tail windows have no data — OpenF1 answers those with `404 "No results found"`, which the client treats as an empty chunk rather than a failure.
+3. Throttle: global limiter well under 30 req/min (2.5 s spacing ≈ 24 req/min); retry with exponential backoff on 429/5xx and transient network errors.
+4. Bake: downsample, sort, normalize → replay JSON. Derive `track.outline` from the leader's fastest clean lap. Driver accent `color` comes from OpenF1's `team_colour`. Large-array steps (bbox, duration) use running folds, not `Math.min(...spread)`, since a race holds ~10⁵ location points.
+5. **Validate:** final `positions` order must equal `session_result` order **for the classified drivers** (the position stream also carries retired/DNS cars that `session_result` leaves unclassified); every classified driver must be present in `drivers` and `locations`; gzipped file must be under the 3 MB cap. Any failure → non-zero exit, no commit.
 6. Update `index.json`, commit, push.
 
 `ingest.yml` runs on cron (Sun 23:00 & Mon 06:00 UTC — covers all race time zones) and via manual dispatch with an optional round input for backfill. If no new race is found, the run is a cheap no-op.

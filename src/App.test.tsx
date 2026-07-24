@@ -38,9 +38,9 @@ it('renders the races placeholder at /races', () => {
   expect(screen.getByRole('heading', { name: /races/i })).toBeInTheDocument()
 })
 
-it('renders the replay placeholder for its round at /replay/:round', () => {
+it('routes /replay/:round to the replay view', () => {
   renderAt('/replay/12')
-  expect(screen.getByRole('heading', { name: /replay.*round 12/i })).toBeInTheDocument()
+  expect(screen.getByText(/loading replay/i)).toBeInTheDocument()
 })
 
 it('navigates between Standings and Races via the top nav', async () => {
