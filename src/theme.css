@@ -42,3 +42,152 @@ a {
 main {
   padding: 1.25rem;
 }
+
+/* Standings — Design.md §7 */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.tabs button,
+.retry {
+  background: var(--panel);
+  color: var(--muted);
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1.25rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  color: var(--text);
+  box-shadow: inset 0 -2px 0 var(--text);
+}
+
+.standings-table {
+  width: 100%;
+  max-width: 40rem;
+  border-collapse: collapse;
+}
+
+.standings-table th {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+
+.standings-table th,
+.standings-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--panel);
+}
+
+.standings-table .num {
+  text-align: right;
+}
+
+.standings-table .points {
+  font-weight: 700;
+}
+
+.team-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.team-bar {
+  display: inline-block;
+  width: 4px;
+  height: 1em;
+  border-radius: 1px;
+}
+
+.standings-status {
+  color: var(--muted);
+}
+
+/* Races — Design.md §7 */
+.races-status {
+  color: var(--muted);
+}
+
+.race-list {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.75rem;
+  max-width: 60rem;
+}
+
+.race-card {
+  position: relative;
+  background: var(--panel);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+.race-card.upcoming {
+  opacity: 0.45;
+}
+
+.race-card h2 {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+}
+
+.race-card-link {
+  display: block;
+  text-decoration: none;
+}
+
+.race-round {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.race-venue {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.podium {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.podium li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+}
+
+.podium .num {
+  color: var(--muted);
+  width: 1ch;
+  text-align: right;
+}
+
+.replay-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.race-card-link:hover .replay-badge {
+  color: var(--text);
+}

@@ -1,8 +1,24 @@
-import { expect, it } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import App from './App'
+
+// StandingsPage fetches on mount — stub the network out of routing tests.
+beforeEach(() => {
+  sessionStorage.clear()
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ MRData: { StandingsTable: { StandingsLists: [] } } }),
+    })),
+  )
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 function renderAt(path: string) {
   return render(
