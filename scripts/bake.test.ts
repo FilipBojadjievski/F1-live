@@ -55,6 +55,18 @@ it('bakeIntervals sorts by t and drops the leader (null gap)', () => {
   ])
 })
 
+it('bakeIntervals preserves lapped-car interval strings ("+1 LAP") verbatim', () => {
+  const raw: RawInterval[] = [
+    { date: at(0), driver_number: 44, interval: 1.2 },
+    { date: at(0), driver_number: 23, interval: '+1 LAP' }, // lapped — kept, not dropped
+  ]
+
+  expect(bakeIntervals(raw, START)).toEqual([
+    { t: 0, num: 23, gap: '+1 LAP' },
+    { t: 0, num: 44, gap: 1.2 },
+  ])
+})
+
 const locs: RawLocation[] = [
   { date: at(0), driver_number: 1, x: 100, y: 200 },
   { date: at(0.2), driver_number: 1, x: 110, y: 210 }, // same 500ms bucket — dropped

@@ -49,10 +49,11 @@ export function bakePositions(raw: RawPosition[], startTime: string): PositionEv
   return out
 }
 
-// Absolute gap-to-car-ahead samples, sorted by t. Leader samples (null interval) are dropped.
+// Absolute gap-to-car-ahead samples, sorted by t. Leader samples (null interval) are dropped;
+// lapped cars keep OpenF1's "+1 LAP" string, numeric samples the seconds gap.
 export function bakeIntervals(raw: RawInterval[], startTime: string): IntervalSample[] {
   return raw
-    .filter((r): r is RawInterval & { interval: number } => r.interval !== null)
+    .filter((r): r is RawInterval & { interval: number | string } => r.interval !== null)
     .sort((a, b) => Date.parse(a.date) - Date.parse(b.date) || a.driver_number - b.driver_number)
     .map(r => ({ t: toMs(r.date, startTime), num: r.driver_number, gap: r.interval }))
 }

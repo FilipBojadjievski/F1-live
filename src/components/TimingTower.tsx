@@ -12,7 +12,8 @@ interface TimingTowerProps {
 function gapText(entry: OrderEntry, isLeader: boolean): string {
   if (entry.retired) return 'OUT'
   if (isLeader) return 'Leader'
-  return `+${entry.gap.toFixed(1)}`
+  // Lapped cars carry OpenF1's already-signed string ("+1 LAP"); numeric gaps get a '+' prefix.
+  return typeof entry.gap === 'number' ? `+${entry.gap.toFixed(1)}` : entry.gap
 }
 
 // FLIP: capture each row's previous top, then on the next paint animate from the old position to

@@ -57,3 +57,15 @@ it('shows no divider when nobody has retired', () => {
   renderTower(order.map(o => ({ ...o, retired: false })))
   expect(screen.queryByRole('separator')).toBeNull()
 })
+
+// Lapped cars carry OpenF1's string interval ("+1 LAP") instead of a numeric gap. The tower must
+// render it verbatim rather than calling toFixed on a string.
+it('renders a lapped car interval string as-is', () => {
+  const lapped: OrderEntry[] = [
+    { num: 1, pos: 1, gap: 0, retired: false },
+    { num: 2, pos: 2, gap: '+1 LAP', retired: false },
+  ]
+  renderTower(lapped)
+  const rows = screen.getAllByRole('listitem')
+  expect(within(rows[1]).getByTestId('gap')).toHaveTextContent('+1 LAP')
+})

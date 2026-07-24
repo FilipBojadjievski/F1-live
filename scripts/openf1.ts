@@ -27,7 +27,7 @@ export interface RawPosition {
 export interface RawInterval {
   date: string
   driver_number: number
-  interval: number | null // gap to car ahead, seconds; null for the leader
+  interval: number | string | null // gap to car ahead: seconds, "+1 LAP" for lapped cars, null for the leader
 }
 
 export interface RawLap {

@@ -36,7 +36,7 @@ export interface PositionEvent {
 export interface IntervalSample {
   t: number
   num: number
-  gap: number // seconds to the car ahead
+  gap: number | string // seconds to the car ahead, or a lapped-car label ("+1 LAP")
 }
 
 // Per driver number (as string key) → flat [t0, x0, y0, t1, x1, y1, ...] triplets, sorted by t.

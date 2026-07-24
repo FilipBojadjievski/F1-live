@@ -6,7 +6,7 @@ import type { ReplayFile } from './format'
 export interface OrderEntry {
   num: number
   pos: number
-  gap: number // seconds to the car ahead; 0 for the leader / before the first sample
+  gap: number | string // seconds to the car ahead (0 for leader/pre-first-sample), or a lapped-car label ("+1 LAP")
   retired: boolean
 }
 
@@ -68,7 +68,7 @@ export class ReplayEngine {
   private clock = 0
   // Per-driver views into the (already t-sorted) global streams, for O(log n) seek per driver.
   private positionsByNum = new Map<number, { t: number; pos: number }[]>()
-  private intervalsByNum = new Map<number, { t: number; gap: number }[]>()
+  private intervalsByNum = new Map<number, { t: number; gap: number | string }[]>()
   private retiredAt = new Map<number, number>()
   private readonly source: RaceDataSource
 
