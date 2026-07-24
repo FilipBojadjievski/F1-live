@@ -32,23 +32,16 @@ it('validateReplay passes a well-formed replay under the size cap', () => {
   expect(validateReplay(validReplay(), SMALL)).toEqual([])
 })
 
-it('validateReplay flags a final position order that disagrees with the result', () => {
+it('validateReplay treats session_result as authoritative and does not compare the position stream order', () => {
   const r = validReplay()
+  // A post-race penalty case: result classifies 44 ahead of 1, even though the position stream ends
+  // with 1 leading. This must NOT be flagged — session_result is the source of truth.
   r.result = [
-    { pos: 1, num: 44 }, // result says 44 won, but the positions stream ends with 1 leading
+    { pos: 1, num: 44 },
     { pos: 2, num: 1 },
   ]
 
-  expect(validateReplay(r, SMALL)).toEqual([expect.stringMatching(/final position order/i)])
-})
-
-it('validateReplay ignores unclassified drivers (retired/DNS) when checking finishing order', () => {
-  const r = validReplay()
-  // A retired car keeps emitting positions but never appears in session_result (null position → dropped).
-  r.positions.push({ t: 500, num: 77, pos: 3 })
-  r.locations['77'] = [0, 0, 0]
-
-  expect(validateReplay(r, SMALL)).toEqual([]) // 1 ahead of 44 still holds among the classified
+  expect(validateReplay(r, SMALL)).toEqual([])
 })
 
 it('validateReplay flags a file at or over the gzip size cap', () => {

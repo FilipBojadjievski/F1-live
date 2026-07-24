@@ -5,27 +5,12 @@ import type { ReplayFile } from '../src/replay/format.ts'
 
 export const MAX_GZIP_BYTES = 3 * 1024 * 1024 // < 3 MB gzipped
 
-// Order the drivers by their last position event — the finishing order the replay actually plays out.
-function finalOrder(replay: ReplayFile): number[] {
-  const lastPos = new Map<number, { t: number; pos: number }>()
-  for (const e of replay.positions) {
-    const prev = lastPos.get(e.num)
-    if (!prev || e.t >= prev.t) lastPos.set(e.num, { t: e.t, pos: e.pos })
-  }
-  return [...lastPos.entries()].sort((a, b) => a[1].pos - b[1].pos).map(([num]) => num)
-}
-
 export function validateReplay(replay: ReplayFile, gzippedBytes: number): string[] {
   const errors: string[] = []
 
-  // Compare only the classified drivers: the position stream also carries retired/DNS cars that
-  // session_result leaves unclassified (null position), and their trailing order is not official.
-  const official = replay.result.map(r => r.num)
-  const classified = new Set(official)
-  const played = finalOrder(replay).filter(num => classified.has(num))
-  if (played.join(',') !== official.join(',')) {
-    errors.push(`final position order [${played}] does not match session result [${official}]`)
-  }
+  // session_result is the authoritative finishing order: it reflects post-race penalties, which the
+  // live position stream does not. So we don't assert the position stream matches it — the two
+  // legitimately disagree when a car is reclassified after the flag.
 
   if (gzippedBytes >= MAX_GZIP_BYTES) {
     errors.push(`gzipped size ${gzippedBytes} bytes is at or over the ${MAX_GZIP_BYTES}-byte cap`)
